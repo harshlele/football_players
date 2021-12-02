@@ -81,6 +81,7 @@ html,body,#root,.App {
 
 .btn-search{
   border-left: 0;
+  padding: 0.5rem;
 }
 
 .input_txt:focus{
@@ -152,6 +153,11 @@ html,body,#root,.App {
 
 button.input:hover{
   cursor: pointer;
+}
+
+.btn{
+  padding: 0.5rem;
+  font-size: 1.2rem;
 }
 
 button.input:active{
