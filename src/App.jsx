@@ -10,9 +10,13 @@ imgImport.keys().forEach((key) => {
 
 function App() {
   const [players,setPlayers] = useState([]);
-  const [teams,setTeams] = useState([]);
+  const [playerDisp,setPlayerDisp] = useState([]);
+  const [filters, setFilters] = useState({
+    search: null,
+    sort: "Value",
+    order: 1
+  });
 
-  console.log(imgAssets);
 
   useEffect(() => {
     fetch("https://api.npoint.io/20c1afef1661881ddc9c",{
@@ -22,13 +26,35 @@ function App() {
     .then(res => {
       let p = res.playerList.map(p => ({...p,img: imgAssets[p.Id]}));
       setPlayers(p);
-      setTeams(res.teamsList);
+      let filtered = p.sort((a,b) => parseFloat(a.Value) - parseFloat(b.Value));
+      setPlayerDisp(filtered);
     });
   
   },[]);
 
-  const onSortFilter = (filter) => {
-    console.log(filter);
+  useEffect(() => {
+    let newList = 
+      players.filter(p => {
+        if(!filters.search) return true;
+        let s = filters.search.toLowerCase();
+        return p.TName.toLowerCase().includes(s) || p.PFName.toLowerCase().includes(s);
+      })
+      .sort((a,b) => {
+        if(filters.sort == '') return 0;
+        if(filters.sort == "Value"){
+          return (parseFloat(a.Value) - parseFloat(b.Value)) * filters.order;
+        }
+        else {
+          return (a.PFName.toLowerCase() < b.PFName.toLowerCase() ? -1 : 1) * filters.order;
+        }
+      });
+      setPlayerDisp(newList);
+  },[filters]);
+
+  const onSortFilter = (e) => {
+    let newVal = {...filters}
+    newVal[e["event"]] = e["val"];
+    setFilters(newVal);
   }
 
   return (
@@ -38,7 +64,7 @@ function App() {
 
         <div className="w-100 grid card_cont">
           {
-            players.map(p => <Card key={p.Id} player={p}/>)
+            playerDisp.map(p => <Card key={p.Id} player={p}/>)
           }
           
         </div>
